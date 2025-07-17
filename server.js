@@ -213,8 +213,8 @@ async function run() {
               quantity: 1,
             },
           ],
-          success_url: `http://localhost:5173/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-          cancel_url: `http://localhost:5173/payment-cancelled`,
+          success_url: `https://carecamp-06.web.app/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `https://carecamp-06.web.app/payment-cancelled`,
         });
 
         res.send({ url: session.url });
