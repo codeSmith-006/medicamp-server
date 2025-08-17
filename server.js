@@ -277,6 +277,19 @@ async function run() {
       res.send(loggedUserData);
     });
 
+    // GET method to get all users data for admin
+    app.get("/all-users", verifyToken, verifyAdminRole, async (req, res) => {
+      try {
+        const users = await UsersCollection.find({}).toArray();
+        res.send(users);
+      } catch (error) {
+        console.error("Error fetching all users:", error);
+        res
+          .status(500)
+          .json({ message: "Server error while fetching users data" });
+      }
+    });
+
     app.get("/camps", async (req, res) => {
       try {
         const { search = "", sort = "", page = 1, limit = 9 } = req.query;
@@ -333,25 +346,21 @@ async function run() {
     });
 
     // GET method to get registered participants for the logged-in user
-    app.get(
-      "/registered-participant",
-      verifyToken,
-      async (req, res) => {
-        try {
-          const loggedUserEmail = req.decoded.email;
+    app.get("/registered-participant", verifyToken, async (req, res) => {
+      try {
+        const loggedUserEmail = req.decoded.email;
 
-          const registeredParticipantsData =
-            await registeredParticipantsCollection
-              .find({ loggedUserEmail }) // Only return data for this user
-              .toArray();
+        const registeredParticipantsData =
+          await registeredParticipantsCollection
+            .find({ loggedUserEmail }) // Only return data for this user
+            .toArray();
 
-          res.send(registeredParticipantsData);
-        } catch (error) {
-          console.error("Error fetching registered participants:", error);
-          res.status(500).json({ message: "Server error while fetching data" });
-        }
+        res.send(registeredParticipantsData);
+      } catch (error) {
+        console.error("Error fetching registered participants:", error);
+        res.status(500).json({ message: "Server error while fetching data" });
       }
-    );
+    });
 
     // GET  method to get all registered  participants data for admin
     app.get(
@@ -417,21 +426,17 @@ async function run() {
     // --------------------------------------------PATCH------------------------------
 
     // participant profile update method
-    app.patch(
-      "/users/participants-profile",
-      verifyToken,
-      async (req, res) => {
-        try {
-          const result = await UsersCollection.updateOne(
-            { email: req.decoded.email },
-            { $set: req.body }
-          );
-          res.json(result);
-        } catch (err) {
-          res.status(500).json({ error: err.message });
-        }
+    app.patch("/users/participants-profile", verifyToken, async (req, res) => {
+      try {
+        const result = await UsersCollection.updateOne(
+          { email: req.decoded.email },
+          { $set: req.body }
+        );
+        res.json(result);
+      } catch (err) {
+        res.status(500).json({ error: err.message });
       }
-    );
+    });
 
     // patch method for updating camp data
     app.patch("/camps/:id", async (req, res) => {
